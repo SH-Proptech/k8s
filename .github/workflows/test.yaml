@@ -2,7 +2,7 @@ name: Provision Infrastructure
 
 on:
   push:
-    branches:
+    branches-ignore:
       - main
 
 jobs:
@@ -51,56 +51,56 @@ jobs:
         run: ./taskfile repositories
       
       - name: Install one-password
-        run: ./taskfile one-password
+        run: ./taskfile one-password --dry-run
         env:
           OP_CREDENTIALS_B64: ${{ secrets.OP_CREDENTIALS_B64 }} 
           OP_CONNECT_TOKEN: ${{ secrets.OP_CONNECT_TOKEN }} 
 
       - name: Install secrets
-        run: ./taskfile secrets
+        run: ./taskfile secrets --dry-run
 
       - name: Install cert-manager
-        run: ./taskfile cert-manager
+        run: ./taskfile cert-manager --dry-run
       
       - name: Install ingress-nginx
-        run: ./taskfile ingress-nginx
+        run: ./taskfile ingress-nginx --dry-run
 
       - name: Install external-dns 
-        run: ./taskfile external-dns
+        run: ./taskfile external-dns --dry-run
         env:
           CLOUDFLARE_SECRET: ${{ secrets.CLOUDFLARE_SECRET }} 
 
       - name: Install atlas-operator
-        run: ./taskfile atlas-operator
+        run: ./taskfile atlas-operator --dry-run
 
       - name: Install prometheus
-        run: ./taskfile prometheus
+        run: ./taskfile prometheus --dry-run
         env:
           GRAFANA_PASSWORD: ${{ secrets.GRAFANA_PASSWORD }} 
           GRAFANA_RW_DB_PASSWORD: ${{ secrets.GRAFANA_RW_DB_PASSWORD }} 
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 
       - name: Install loki
-        run: ./taskfile loki
+        run: ./taskfile loki --dry-run
 
       - name: Install tempo
-        run: ./taskfile tempo
+        run: ./taskfile tempo --dry-run
 
       - name: Install redis
-        run: ./taskfile redis
+        run: ./taskfile redis --dry-run
         env:
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }} 
 
       - name: Install redis-exporter
-        run: ./taskfile redis-exporter
+        run: ./taskfile redis-exporter --dry-run
         env:
           REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }} 
 
       - name: Install postgres-exporter
-        run: ./taskfile postgres-exporter
+        run: ./taskfile postgres-exporter --dry-run
 
       - name: Install tooling
-        run: ./taskfile tooling
+        run: ./taskfile tooling --dry-run
         env:
           CLOUDFLARE_SECRET: ${{ secrets.CLOUDFLARE_SECRET }} 
           DB_PASSWORD: ${{ secrets.DB_PASSWORD }} 
