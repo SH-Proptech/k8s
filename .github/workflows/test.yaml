@@ -1,0 +1,107 @@
+name: Provision Infrastructure
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Validate that all required secrets are present
+      - name: Validate Secrets
+        shell: bash
+        run: |
+          REQUIRED_SECRETS=(
+            ATLAS_TOKEN
+            AZURE_CREDS
+            CLOUDFLARE_SECRET
+            DB_PASSWORD
+            GRAFANA_PASSWORD
+            GRAFANA_RW_DB_PASSWORD
+            OP_CONNECT_TOKEN
+            OP_CREDENTIALS_B64
+            REDIS_PASSWORD
+            SLACK_WEBHOOK_URL
+          )
+          
+          for secret in "${REQUIRED_SECRETS[@]}"; do
+            if [[ -z "${{ secrets[${secret}] }}" ]]; then
+              echo "Missing required secret: $secret"
+              exit 1
+            fi
+          done
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDS }}
+
+      - name: Gets K8s context
+        uses: azure/aks-set-context@v4
+        with:
+          resource-group: prop_rg
+          cluster-name: prop_aks
+
+      - name: Update repositories
+        run: ./taskfile repositories
+      
+      - name: Install one-password
+        run: ./taskfile one-password --dry-run
+        env:
+          OP_CREDENTIALS_B64: ${{ secrets.OP_CREDENTIALS_B64 }} 
+          OP_CONNECT_TOKEN: ${{ secrets.OP_CONNECT_TOKEN }} 
+
+      - name: Install secrets
+        run: ./taskfile secrets --dry-run
+
+      - name: Install cert-manager
+        run: ./taskfile cert-manager --dry-run
+      
+      - name: Install ingress-nginx
+        run: ./taskfile ingress-nginx --dry-run
+
+      - name: Install external-dns 
+        run: ./taskfile external-dns --dry-run
+        env:
+          CLOUDFLARE_SECRET: ${{ secrets.CLOUDFLARE_SECRET }} 
+
+      - name: Install atlas-operator
+        run: ./taskfile atlas-operator --dry-run
+
+      - name: Install prometheus
+        run: ./taskfile prometheus --dry-run
+        env:
+          GRAFANA_PASSWORD: ${{ secrets.GRAFANA_PASSWORD }} 
+          GRAFANA_RW_DB_PASSWORD: ${{ secrets.GRAFANA_RW_DB_PASSWORD }} 
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Install loki
+        run: ./taskfile loki --dry-run
+
+      - name: Install tempo
+        run: ./taskfile tempo --dry-run
+
+      - name: Install redis
+        run: ./taskfile redis --dry-run
+        env:
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }} 
+
+      - name: Install redis-exporter
+        run: ./taskfile redis-exporter --dry-run
+        env:
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }} 
+
+      - name: Install postgres-exporter
+        run: ./taskfile postgres-exporter --dry-run
+
+      - name: Install tooling
+        run: ./taskfile tooling --dry-run
+        env:
+          CLOUDFLARE_SECRET: ${{ secrets.CLOUDFLARE_SECRET }} 
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }} 
+          ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }} 
