@@ -1,0 +1,17 @@
+redisAddress: "redis://my-redis-master.redis.svc.cluster.local:6379"
+
+auth:
+  enabled: true
+
+service:
+  labels:
+    monitoring: enabled
+    
+serviceMonitor:
+  enabled: true
+  multipleTarget: true
+  targets:
+    - url: "redis://my-redis-master.redis.svc.cluster.local:6379"
+      name: redis-master
+    - url: "redis://my-redis-replicas.redis.svc.cluster.local:6379"
+      name: redis-replicas

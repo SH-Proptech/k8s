@@ -1,0 +1,12 @@
+apiVersion: storage.k8s.io/v1
+kind: StorageClass
+metadata:
+  name: azureblob-propsa
+provisioner: blob.csi.azure.com
+parameters:
+  skuName: Premium_LRS
+  resourceGroup: prop_rg
+  containerName: prop-blob
+  storageAccount: propsa
+  protocol: fuse
+reclaimPolicy: Retain

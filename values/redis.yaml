@@ -1,0 +1,33 @@
+auth:
+  enabled: true
+
+persistence:
+  enabled: false
+
+master:
+  replicaCount: 1
+  disableCommands: []
+  resources:
+    requests:
+      memory: "1Gi"  # Ensure that the requested memory matches the Redis maxmemory setting
+      cpu: "500m"
+    limits:
+      memory: "2Gi"  # Set a limit higher than the maxmemory to accommodate overhead
+      cpu: "1"
+  config:
+    maxmemory: "1gb"
+    maxmemory-policy: allkeys-lru
+
+replica:
+  replicaCount: 0
+  disableCommands: []
+  resources:
+    requests:
+      memory: "1Gi"
+      cpu: "500m"
+    limits:
+      memory: "2Gi"
+      cpu: "1"
+  config:
+    maxmemory: "1gb"
+    maxmemory-policy: allkeys-lru

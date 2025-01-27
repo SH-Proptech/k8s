@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PodMonitor
+metadata:
+  name: generic-podmonitor
+  namespace: monitoring
+spec:
+  podMetricsEndpoints:
+    - path: metrics
+      port: http-metrics
+  namespaceSelector:
+    any: true
+  selector:
+    matchLabels:
+      monitoring: enabled

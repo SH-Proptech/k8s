@@ -1,0 +1,10 @@
+cloudflare:
+  proxied: false
+policy: sync
+provider: cloudflare
+sources:
+  - ingress
+txtOwnerId: aks
+domainFilters:
+  - propylitics.com
+  - propmatch.co.uk

@@ -1,0 +1,86 @@
+grafana:
+  adminUser: prop_admin
+  replicaCount: 1  # Set Grafana replicas to 1
+  persistence:
+    enabled: true
+    storageClassName: managed  # Choose a cost-effective storage class
+    accessModes:
+      - ReadWriteOnce
+    size: 2Gi  # Adjust size as needed
+  additionalDataSources:
+    - name: Loki
+      type: loki
+      url: http://loki.logging.svc.cluster.local:3100
+      access: proxy
+      isDefault: false
+    # Uncomment and configure PostgreSQL and Redis as needed
+    # - name: PostgreSQL
+    #   type: postgres
+    #   url: prop-server.postgres.database.azure.com:5432
+    #   access: proxy
+    #   database: prop-db
+    #   user: grafana_ro
+    #   jsonData:
+    #     sslmode: "require"
+    #   isDefault: false
+    # - name: Redis
+    #   type: redis
+    #   url: "redis://:YJRbQ9-iv@NY!yjTw@ARa4X-o-yhDqaemzZzGfPa@my-redis-master.redis.svc.cluster.local:6379"
+    #   access: proxy
+    #   isDefault: false
+  deleteDatasources:
+    - name: "Redis"
+      orgId: 1
+    - name: "PostgreSQL"
+      orgId: 1
+
+kubeControllerManager:
+  enabled: false
+kubeProxy:
+  enabled: false
+kubeScheduler:
+  enabled: false
+
+prometheus:
+  prometheusSpec:
+    podMonitorSelectorNilUsesHelmValues: false
+    serviceMonitorSelectorNilUsesHelmValues: false
+    ruleSelector:
+      matchExpressions:
+        - key: prometheus
+          operator: In
+          values:
+            - notification-rules
+
+alertmanager:
+  config:
+    global:
+      resolve_timeout: 5m
+    route:
+      group_by: ['job']
+      group_wait: 30s
+      group_interval: 5m
+      repeat_interval: 12h
+      receiver: 'slack'
+      routes:
+        - match:
+            alertname: JobFailed
+          receiver: 'slack'
+        - match:
+            alertname: JobSucceeded
+          receiver: 'slack'
+    receivers:
+      - name: 'slack'
+        slack_configs:
+          - channel: '#github'  # Replace with your desired Slack channel
+            send_resolved: true
+            title: '[{{ .Status | toUpper }}] Monitoring Event Notification'
+            text: >-
+              {{ range .Alerts }}
+                *Alert:* {{ .Annotations.summary }} - `{{ .Labels.severity }}`
+                *Description:* {{ .Annotations.description }}
+                *Graph:* <{{ .GeneratorURL }}|:chart_with_upwards_trend:> *Runbook:* <{{ .Annotations.runbook }}|:spiral_note_pad:>
+                *Details:*
+                {{ range .Labels.SortedPairs }} • *{{ .Name }}:* `{{ .Value }}`
+                {{ end }}
+              {{ end }}

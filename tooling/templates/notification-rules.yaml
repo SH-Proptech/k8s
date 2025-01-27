@@ -1,0 +1,49 @@
+apiVersion: monitoring.coreos.com/v1
+kind: PrometheusRule
+metadata:
+  name: job-and-deployment-alerts
+  namespace: monitoring
+  labels:
+    role: alert-rules
+    prometheus: notification-rules
+spec:
+  groups:
+    - name: job-status-alerts-group
+      rules:
+        # Job Alerts
+        - alert: JobFailed
+          expr: kube_job_status_failed > 0
+          for: 1m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Job Failed: {{`{{`}} $labels.job }}"
+            description: "The job '{{`{{`}} $labels.job }}' in namespace '{{`{{`}} $labels.namespace }}' has failed."
+
+        - alert: JobSucceeded
+          expr: kube_job_status_succeeded > 0
+          for: 1m
+          labels:
+            severity: info
+          annotations:
+            summary: "Job Succeeded: {{`{{`}} $labels.job }}"
+            description: "The job '{{`{{`}} $labels.job }}' in namespace '{{`{{`}} $labels.namespace }}' has successfully completed."
+
+        # Deployment Alerts
+        - alert: DeploymentFailed
+          expr: kube_deployment_status_replicas_updated < kube_deployment_spec_replicas
+          for: 5m
+          labels:
+            severity: critical
+          annotations:
+            summary: "Deployment Failed: {{`{{`}} $labels.deployment }}"
+            description: "Deployment '{{`{{`}} $labels.deployment }}' in namespace '{{`{{`}} $labels.namespace }}' has not updated all replicas. Desired: {{`{{`}} $labels.desired }}, Updated: {{`{{`}} $value }}."
+
+        - alert: DeploymentHealthy
+          expr: kube_deployment_status_replicas_available == kube_deployment_spec_replicas
+          for: 2m
+          labels:
+            severity: info
+          annotations:
+            summary: "Deployment Healthy: {{`{{`}} $labels.deployment }}"
+            description: "Deployment '{{`{{`}} $labels.deployment }}' in namespace '{{`{{`}} $labels.namespace }}' is fully healthy. All replicas are available."

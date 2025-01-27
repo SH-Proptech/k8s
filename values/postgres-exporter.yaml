@@ -1,0 +1,17 @@
+service:
+  labels:
+    monitoring: enabled
+    
+serviceMonitor:
+  enabled: true
+
+config:
+  datasource:
+    host: prop-server.postgres.database.azure.com
+    user: grafana_ro
+    port: "5432"
+    database: prop-db
+    sslmode: require
+    passwordSecret:
+      name: grafana-ro
+      key: password

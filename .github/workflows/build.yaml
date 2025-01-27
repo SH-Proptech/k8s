@@ -1,0 +1,83 @@
+name: Provision Infrastructure
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v2
+        with:
+          creds: ${{ secrets.AZURE_CREDS }}
+
+      - name: Gets K8s context
+        uses: azure/aks-set-context@v4
+        with:
+          resource-group: prop_rg
+          cluster-name: prop_aks
+
+      - name: Update repositories
+        run: ./taskfile repositories
+      
+      - name: Install one-password
+        run: ./taskfile one-password
+        env:
+          OP_CREDENTIALS_B64: ${{ secrets.OP_CREDENTIALS_B64 }} 
+          OP_CONNECT_TOKEN: ${{ secrets.OP_CONNECT_TOKEN }} 
+
+      - name: Install secrets
+        run: ./taskfile secrets
+
+      - name: Install cert-manager
+        run: ./taskfile cert-manager
+      
+      - name: Install ingress-nginx
+        run: ./taskfile ingress-nginx
+
+      - name: Install external-dns 
+        run: ./taskfile external-dns
+        env:
+          CLOUDFLARE_SECRET: ${{ secrets.CLOUDFLARE_SECRET }} 
+
+      - name: Install atlas-operator
+        run: ./taskfile atlas-operator
+
+      - name: Install prometheus
+        run: ./taskfile prometheus
+        env:
+          GRAFANA_PASSWORD: ${{ secrets.GRAFANA_PASSWORD }} 
+          GRAFANA_RW_DB_PASSWORD: ${{ secrets.GRAFANA_RW_DB_PASSWORD }} 
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+
+      - name: Install loki
+        run: ./taskfile loki
+
+      - name: Install tempo
+        run: ./taskfile tempo
+
+      - name: Install redis
+        run: ./taskfile redis
+        env:
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }} 
+
+      - name: Install redis-exporter
+        run: ./taskfile redis-exporter
+        env:
+          REDIS_PASSWORD: ${{ secrets.REDIS_PASSWORD }} 
+
+      - name: Install postgres-exporter
+        run: ./taskfile postgres-exporter
+
+      - name: Install tooling
+        run: ./taskfile tooling
+        env:
+          CLOUDFLARE_SECRET: ${{ secrets.CLOUDFLARE_SECRET }} 
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }} 
+          ATLAS_TOKEN: ${{ secrets.ATLAS_TOKEN }} 

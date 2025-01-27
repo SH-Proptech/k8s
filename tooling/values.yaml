@@ -1,0 +1,12 @@
+domain: propmatch.co.uk
+cloudflare: ""
+email: ""
+db_password: ""
+atlas_token: ""
+
+storage:
+  size: 20Gi
+  account: propsa
+  container: prop-blob
+  readOnly: true
+  resourceGroup: prop_rg

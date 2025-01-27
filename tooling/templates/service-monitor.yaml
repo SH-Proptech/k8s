@@ -1,0 +1,14 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: redis-exporter-servicemonitor
+  namespace: monitoring
+spec:
+  endpoints:
+    - port: redis-exporter
+      path: /metrics
+  namespaceSelector:
+    any: true
+  selector:
+    matchLabels:
+      monitoring: enabled
