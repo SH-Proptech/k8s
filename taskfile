@@ -19,9 +19,10 @@ function cert-manager {
   helm upgrade --install cert-manager jetstack/cert-manager \
     --namespace cert-manager \
     --create-namespace \
-    --wait \
     --set crds.enabled=true \
-    --set extraArgs='{--dns01-recursive-nameservers-only,--dns01-recursive-nameservers=1.1.1.1:53,1.0.0.1:53}' 
+    --set extraArgs='{--dns01-recursive-nameservers-only,--dns01-recursive-nameservers=1.1.1.1:53,1.0.0.1:53}' \
+    --wait \
+    ${1:-}
 }
 
 function ingress-nginx { 
@@ -29,9 +30,10 @@ function ingress-nginx {
   helm upgrade --install ingress-nginx ingress-nginx/ingress-nginx \
     --namespace ingress-nginx \
     --create-namespace \
-    --wait \
     --set controller.service.annotations."service\.beta\.kubernetes\.io/azure-load-balancer-health-probe-request-path"=/healthz \
-    --set controller.service.externalTrafficPolicy=Local
+    --set controller.service.externalTrafficPolicy=Local \
+    --wait \
+    ${1:-}
 }
 
 function external-dns { 
@@ -39,9 +41,10 @@ function external-dns {
   helm upgrade --install external-dns bitnami/external-dns \
     --namespace external-dns \
     --create-namespace \
-    --wait \
     --values ./values/external-dns.yaml \
-    --set cloudflare.apiToken=$CLOUDFLARE_SECRET
+    --set cloudflare.apiToken=$CLOUDFLARE_SECRET \
+    --wait \
+    ${1:-}
 }
 
 function atlas-operator {
@@ -49,7 +52,8 @@ function atlas-operator {
   helm upgrade --install atlas-operator oci://ghcr.io/ariga/charts/atlas-operator \
     --namespace atlas-operator \
     --create-namespace \
-    --wait
+    --wait \
+    ${1:-}
 }
 
 function one-password {
@@ -57,11 +61,11 @@ function one-password {
   helm upgrade --install connect 1password/connect \
     --namespace one-password \
     --create-namespace \
-    --wait \
     --values ./values/one-password.yaml \
     --set connect.credentials_base64=$OP_CREDENTIALS_B64 \
     --set operator.token.value=$OP_CONNECT_TOKEN \
-    --wait
+    --wait \
+    ${1:-}
 }
 
 function prometheus {
@@ -73,7 +77,8 @@ function prometheus {
     --set grafana.adminPassword=$GRAFANA_PASSWORD \
     --set grafana.database.password=$GRAFANA_RW_DB_PASSWORD \
     --set alertmanager.config.global.slack_api_url=$SLACK_WEBHOOK_URL \
-    --wait
+    --wait \
+    ${1:-}
 }
 
 function loki {
@@ -82,7 +87,8 @@ function loki {
     --namespace logging \
     --create-namespace \
     --values ./values/loki.yaml \
-    --wait
+    --wait \
+    ${1:-}
 }
 
 function tempo {
@@ -90,7 +96,8 @@ function tempo {
   helm upgrade --install tempo grafana/tempo \
     --namespace observability \
     --create-namespace \
-    --wait
+    --wait \
+    ${1:-}
 }
 
 function redis {
@@ -100,7 +107,8 @@ function redis {
     --create-namespace \
     --values ./values/redis.yaml \
     --set auth.password=$REDIS_PASSWORD \
-    --wait
+    --wait \
+    ${1:-}
 }
 
 function postgres-exporter {
@@ -108,7 +116,8 @@ function postgres-exporter {
   helm upgrade --install postgres-exporter prometheus-community/prometheus-postgres-exporter \
     --namespace monitoring \
     --values ./values/postgres-exporter.yaml \
-    --wait
+    --wait \
+    ${1:-}
 }
 
 function redis-exporter {
@@ -118,28 +127,30 @@ function redis-exporter {
     --values ./values/redis-exporter.yaml \
     --set redis.password=$REDIS_PASSWORD \
     --set auth.redisPassword=$REDIS_PASSWORD \
-    --wait
+    --wait \
+    ${1:-}
 }
 
 function secrets { 
   # Install secrets
-  helm upgrade --install secrets ./secrets --wait 
+  helm upgrade --install secrets ./secrets --wait ${1:-}
 }
 
 function tooling { 
-  # Install secrets
+  # Install tooling
   helm upgrade --install tooling ./tooling \
     --set cloudflare=$CLOUDFLARE_SECRET \
     --set email=$EMAIL \
     --set db_password=$DB_PASSWORD \
     --set atlas_token=$ATLAS_TOKEN \
-    --wait
+    --wait \
+    ${1:-}
 }
 
 # ---------- Do NOT edit below --------------
 
 function help { ## Display usage for this application
-  echo "$0 <task> <args>"
+  echo "$0 <task> [--dry-run]"
   grep -E '^function [a-zA-Z_-]+ {.*?## .*$$' $0 | sed -e 's/function //' | sort | awk 'BEGIN {FS = "{.*?## "}; {printf "\033[93m%-30s\033[92m %s\033[0m\n", $1, $2}'
 }
 
