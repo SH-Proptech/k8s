@@ -31,19 +31,19 @@ spec:
 
         # Deployment Alerts
         - alert: DeploymentFailed
-          expr: kube_deployment_status_replicas_updated < kube_deployment_spec_replicas
+          expr: delta(kube_deployment_status_replicas_updated[5m]) < 0
           for: 5m
           labels:
             severity: critical
           annotations:
             summary: "Deployment Failed: {{`{{`}} $labels.deployment }}"
-            description: "Deployment '{{`{{`}} $labels.deployment }}' in namespace '{{`{{`}} $labels.namespace }}' has not updated all replicas. Desired: {{`{{`}} $labels.desired }}, Updated: {{`{{`}} $value }}."
+            description: "Deployment '{{`{{`}} $labels.deployment }}' in namespace '{{`{{`}} $labels.namespace }}' is failing. Desired: {{`{{`}} $labels.desired }}, Updated: {{`{{`}} $value }}."
 
         - alert: DeploymentHealthy
-          expr: kube_deployment_status_replicas_available == kube_deployment_spec_replicas
+          expr: delta(kube_deployment_status_replicas_available[5m]) > 0
           for: 2m
           labels:
             severity: info
           annotations:
             summary: "Deployment Healthy: {{`{{`}} $labels.deployment }}"
-            description: "Deployment '{{`{{`}} $labels.deployment }}' in namespace '{{`{{`}} $labels.namespace }}' is fully healthy. All replicas are available."
+            description: "Deployment '{{`{{`}} $labels.deployment }}' in namespace '{{`{{`}} $labels.namespace }}' has recovered. All replicas are available."
