@@ -100,6 +100,24 @@ function tempo {
     ${1:-}
 }
 
+function arc {
+  # Install the Github ARC controller
+  helm install arc \
+    --namespace "arc" \
+    --create-namespace \
+    oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller
+}
+
+function arc-runners {
+  # Install the Github ARC runners
+  helm install arc-runners \
+    --namespace "arc-runners" \
+    --create-namespace \
+    --set githubConfigUrl="https://github.com/sh-proptech" \
+    --set githubConfigSecret.secretName="arc" \
+    oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set
+}
+
 function redis {
   # Install Redis
   helm upgrade --install my-redis bitnami/redis \
