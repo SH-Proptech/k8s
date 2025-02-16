@@ -98,6 +98,12 @@ jobs:
       - name: Install tempo
         run: ./taskfile tempo --dry-run
 
+      - name: Install github ARC
+        run: ./taskfile arc --dry-run
+
+      # - name: Install github ARC runners
+      #   run: ./taskfile arc-runners --dry-run
+
       - name: Install redis
         run: ./taskfile redis --dry-run
         env:
