@@ -98,10 +98,10 @@ jobs:
       - name: Install tempo
         run: ./taskfile tempo
 
-      - name: Install Github ARC
+      - name: Install github ARC
         run: ./taskfile arc
 
-      - name: Install Github ARC Runners
+      - name: Install github ARC runners
         run: ./taskfile arc-runners
 
       - name: Install redis
