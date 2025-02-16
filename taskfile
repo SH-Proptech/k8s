@@ -102,20 +102,24 @@ function tempo {
 
 function arc {
   # Install the Github ARC controller
-  helm install arc \
+  helm upgrade --install arc \
     --namespace "arc" \
     --create-namespace \
-    oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller
+    oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set-controller \
+    --wait \
+    ${1:-}
 }
 
 function arc-runners {
   # Install the Github ARC runners
-  helm install arc-runners \
+  helm upgrade --install arc-runners \
     --namespace "arc-runners" \
     --create-namespace \
     --set githubConfigUrl="https://github.com/sh-proptech" \
     --set githubConfigSecret.secretName="arc" \
-    oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set
+    oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set \
+    --wait \
+    ${1:-}
 }
 
 function redis {
