@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  Explore-GitHub-Actions:
+  Test-Arc-Runners:
     # You need to use the INSTALLATION_NAME from the previous step
     runs-on: arc-runners
     steps:
