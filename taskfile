@@ -115,8 +115,7 @@ function arc-runners {
   helm upgrade --install arc-runners \
     --namespace arc-runners \
     --create-namespace \
-    --set githubConfigUrl="https://github.com/sh-proptech" \
-    --set githubConfigSecret="arc" \
+    --values ./values/arc.yaml \
     oci://ghcr.io/actions/actions-runner-controller-charts/gha-runner-scale-set \
     --wait \
     ${1:-}
