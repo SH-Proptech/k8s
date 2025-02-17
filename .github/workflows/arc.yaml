@@ -6,6 +6,7 @@ on:
 jobs:
   Test-Arc-Runners:
     # You need to use the INSTALLATION_NAME from the previous step
-    runs-on: arc-runners
+    runs-on: 
+      labels: arc-runners
     steps:
     - run: echo "🎉 This job uses runner scale set runners!"
