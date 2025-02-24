@@ -1,12 +1,11 @@
 name: Actions Runner Controller Test
 on:
-  # Run manually
+  # Trigger the workflow manually
   workflow_dispatch:
 
 jobs:
   Test-Arc-Runners:
-    # You need to use the INSTALLATION_NAME from the previous step
     runs-on: 
-      labels: arc-runners
+      labels: arc-runners  # Ensure this matches the label of your self-hosted runner
     steps:
     - run: echo "🎉 This job uses runner scale set runners!"
