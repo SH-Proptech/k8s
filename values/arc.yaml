@@ -3,4 +3,4 @@ githubConfigSecret: "arc" # The K8s Secret / OnePassword
 
 maxRunners: 5  # Maximum 5 runners
 minRunners: 1  # Keep at least 1 idle runner
-runnerLabels: "arc-runners"
+
