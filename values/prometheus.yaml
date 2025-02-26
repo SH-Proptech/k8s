@@ -3,9 +3,9 @@ grafana:
   replicaCount: 1  # Set Grafana replicas to 1
   persistence:
     enabled: true
-    storageClassName: managed  # Choose a cost-effective storage class
+    storageClassName: azurefile
     accessModes:
-      - ReadWriteOnce
+      - ReadWriteMany
     size: 2Gi  # Adjust size as needed
   additionalDataSources:
     - name: Loki
@@ -25,14 +25,14 @@ grafana:
     #   isDefault: false
     # - name: Redis
     #   type: redis
-    #   url: "redis://:YJRbQ9-iv@NY!yjTw@ARa4X-o-yhDqaemzZzGfPa@my-redis-master.redis.svc.cluster.local:6379"
+    #   url: "redis://:<password>@my-redis-master.redis.svc.cluster.local:6379"
     #   access: proxy
     #   isDefault: false
-  deleteDatasources:
-    - name: "Redis"
-      orgId: 1
-    - name: "PostgreSQL"
-      orgId: 1
+  # deleteDatasources:
+  #   - name: "Redis"
+  #     orgId: 1
+  #   - name: "PostgreSQL"
+  #     orgId: 1
 
 kubeControllerManager:
   enabled: false
