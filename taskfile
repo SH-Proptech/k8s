@@ -75,7 +75,7 @@ function prometheus {
     --create-namespace \
     --values ./values/prometheus.yaml \
     --set grafana.adminPassword=$GRAFANA_PASSWORD \
-    --set grafana.database.password=$GRAFANA_RW_DB_PASSWORD \
+    --set grafana.grafana.ini.database.password=$GRAFANA_RW_DB_PASSWORD \
     --set alertmanager.config.global.slack_api_url=$SLACK_WEBHOOK_URL \
     --wait \
     ${1:-}
