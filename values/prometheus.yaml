@@ -1,11 +1,12 @@
 grafana:
   adminUser: prop_admin
   replicaCount: 1  # Set Grafana replicas to 1
-  database:
-    type: postgres
-    host: prop-blue-server.postgres.database.azure.com:5432  # Use the service name of the PostgreSQL instance
-    name: grafana
-    user: grafana_rw
+  grafana.ini:
+    database:
+      type: postgres
+      host: prop-blue-server.postgres.database.azure.com:5432  # Use the service name of the PostgreSQL instance
+      name: grafana
+      user: grafana_rw
   persistence:
     enabled: false
     # storageClassName: azurefile
