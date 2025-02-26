@@ -8,6 +8,13 @@ grafana:
       name: grafana
       user: grafana_rw
       ssl_mode: require
+      password: $__file{/etc/secrets/password}  # Securely fetches password from file
+
+  extraSecretMounts:
+    - name: grafana-db-secret
+      secretName: grafana-rw  # Use the existing secret
+      mountPath: /etc/secrets
+      readOnly: true
   persistence:
     enabled: false
     # storageClassName: azurefile
