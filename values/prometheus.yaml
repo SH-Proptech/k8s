@@ -7,6 +7,7 @@ grafana:
       host: prop-blue-server.postgres.database.azure.com:5432  # Use the service name of the PostgreSQL instance
       name: grafana
       user: grafana_rw
+      ssl_mode: require
   persistence:
     enabled: false
     # storageClassName: azurefile
